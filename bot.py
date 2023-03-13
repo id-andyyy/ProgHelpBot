@@ -18,7 +18,7 @@ async def main():
 
     logger.info('Starting bot')
 
-    config = load_config(r'')
+    config = load_config(r'.env')
 
     bot: Bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp: Dispatcher = Dispatcher()
