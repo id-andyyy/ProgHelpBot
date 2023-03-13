@@ -4,6 +4,7 @@ from aiogram.types import Message
 
 from lexicon.lexicon_user import LEXICON_USER
 
+
 router: Router = Router()
 
 
