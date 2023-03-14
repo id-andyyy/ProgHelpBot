@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
 
-
 storage: MemoryStorage = MemoryStorage()
 
 user_dict: dict[int, dict[str, str | list | int | bool]] = {}

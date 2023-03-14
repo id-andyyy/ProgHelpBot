@@ -5,10 +5,9 @@ from aiogram.types import Message, ReplyKeyboardRemove
 
 from states.admin_states import *
 from lexicon.lexicon_admin import LEXICON_ADMIN, LEXICON_KEYBOARDS_ADMIN
-
 from filters.is_admin import IsAdmin
-
 from keyboards.admin_keyboard import *
+from database.sqlite import sql_add_article
 
 router: Router = Router()
 
@@ -56,7 +55,7 @@ async def process_link_sent(message: Message, state: FSMContext):
 
 @router.message(StateFilter(FSMAddArticle.fill_keywords), IsAdmin())
 async def process_keywords_sent(message: Message, state: FSMContext):
-    await state.update_data(keywords=message.text.lower().split(', '))
+    await state.update_data(keywords=message.text.lower())
     await message.answer(text=LEXICON_ADMIN['fill_section'])  # add keyboard
     await state.set_state(FSMAddArticle.fill_section)
 
@@ -79,7 +78,11 @@ async def process_position_sent(message: Message, state: FSMContext):
                 Text(text=[LEXICON_KEYBOARDS_ADMIN['available_button'],
                            LEXICON_KEYBOARDS_ADMIN['not_available_button']]), IsAdmin())
 async def process_is_available_sent(message: Message, state: FSMContext):
-    await state.update_data(is_available=message.text)
+    if message.text == LEXICON_KEYBOARDS_ADMIN['available_button']:
+        await state.update_data(is_available=True)
+    else:
+        await state.update_data(is_available=False)
+
     user_dict[message.from_user.id] = await state.get_data()
 
     await message.answer(text=LEXICON_ADMIN['check_data'].format(**user_dict[message.from_user.id]),
@@ -98,9 +101,14 @@ async def warning_not_is_available(message: Message):
                 Text(text=[LEXICON_KEYBOARDS_ADMIN['allow_publishing_button'],
                            LEXICON_KEYBOARDS_ADMIN['not_allow_publishing_button']]), IsAdmin())
 async def process_allow_publishing_sent(message: Message, state: FSMContext):
+    if message.text == LEXICON_KEYBOARDS_ADMIN['allow_publishing_button']:
+        await sql_add_article(user_dict[message.from_user.id])
+        await message.answer(text=LEXICON_ADMIN['success'],
+                             reply_markup=ReplyKeyboardRemove())
+    else:
+        await message.answer(text=LEXICON_ADMIN['/cancel2'],
+                             reply_markup=ReplyKeyboardRemove())
     await state.clear()
-    await message.answer(text=LEXICON_ADMIN['success'],
-                         reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(StateFilter(FSMAddArticle.allow_publishing), IsAdmin())

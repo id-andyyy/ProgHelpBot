@@ -7,6 +7,7 @@ from config_data.config import load_config
 from states import admin_states
 from keyboards.set_menu import set_user_menu, set_admin_menu
 from handlers import user_handlers, admin_handlers, other_handlers
+from database.sqlite import sql_start
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,8 @@ async def main():
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
     dp.include_router(other_handlers.router)
+    
+    sql_start(config.db.database)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
