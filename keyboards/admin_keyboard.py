@@ -2,9 +2,20 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from lexicon.lexicon_admin import LEXICON_KEYBOARDS_ADMIN
+from database.sqlite import sql_get_sections
 
 
-def create_is_available_keyboard() -> ReplyKeyboardMarkup:
+async def create_sections_keyboard() -> ReplyKeyboardMarkup:
+    sections: list[tuple[int | str]] = await sql_get_sections()
+
+    sections_builder: ReplyKeyboardMarkup = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text=f'{section[1]}')] for section in sorted(sections, key=lambda x: x[2])],
+        resize_keyboard=True)
+
+    return sections_builder
+
+
+async def create_is_available_keyboard() -> ReplyKeyboardMarkup:
     available_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['available_button'])
     not_available_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['not_available_button'])
     availability_builder: ReplyKeyboardMarkup = ReplyKeyboardMarkup(keyboard=[[available_button, not_available_button]],
@@ -12,7 +23,7 @@ def create_is_available_keyboard() -> ReplyKeyboardMarkup:
     return availability_builder
 
 
-def create_allow_publishing_keyboard() -> ReplyKeyboardMarkup:
+async def create_allow_publishing_keyboard() -> ReplyKeyboardMarkup:
     allow_publishing_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['allow_publishing_button'])
     not_allow_publishing_button: KeyboardButton = KeyboardButton(
         text=LEXICON_KEYBOARDS_ADMIN['not_allow_publishing_button'])
