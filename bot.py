@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 
 from config_data.config import load_config
 from states import admin_states
-from keyboards.set_menu import set_main_menu
+from keyboards.set_menu import set_user_menu, set_admin_menu
 from handlers import user_handlers, admin_handlers, other_handlers
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,8 @@ async def main():
     bot: Bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp: Dispatcher = Dispatcher(storage=admin_states.storage)
 
-    await set_main_menu(bot)
+    await set_user_menu(bot)
+    await set_admin_menu(bot)
 
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
@@ -38,4 +39,4 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logger.error('Bot stopped!')
+        logger.error('Bot stopped')
