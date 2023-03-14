@@ -15,18 +15,21 @@ router: Router = Router()
 
 @router.message(Command(commands='cancel'), StateFilter(default_state), IsAdmin())
 async def process_cancel_command(message: Message):
-    await message.answer(text=LEXICON_ADMIN['/cancel1'])
+    await message.answer(text=LEXICON_ADMIN['/cancel1'],
+                         reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(Command(commands='cancel'), ~StateFilter(default_state), IsAdmin())
 async def process_cancel_command_state(message: Message, state: FSMContext):
-    await message.answer(text=LEXICON_ADMIN['/cancel2'])
+    await message.answer(text=LEXICON_ADMIN['/cancel2'],
+                         reply_markup=ReplyKeyboardRemove())
     await state.clear()
 
 
 @router.message(Command(commands=['addarticle']), StateFilter(default_state), IsAdmin())
 async def process_addarticle_command(message: Message, state: FSMContext):
-    await message.answer(text=LEXICON_ADMIN['fill_title'])
+    await message.answer(text=LEXICON_ADMIN['fill_title'],
+                         reply_markup=ReplyKeyboardRemove())
     await state.set_state(FSMAddArticle.fill_title)
 
 
@@ -76,17 +79,10 @@ async def process_position_sent(message: Message, state: FSMContext):
                 Text(text=[LEXICON_KEYBOARDS_ADMIN['available_button'],
                            LEXICON_KEYBOARDS_ADMIN['not_available_button']]), IsAdmin())
 async def process_is_available_sent(message: Message, state: FSMContext):
-    await state.update_data(is_published=message.text)
+    await state.update_data(is_available=message.text)
     user_dict[message.from_user.id] = await state.get_data()
 
-    await message.answer(text=LEXICON_ADMIN['check_data'])
-    await message.answer(text=f'<b>Название:</b> {user_dict[message.from_user.id]["title"]}\n'
-                              f'<b>Смайлик:</b> {user_dict[message.from_user.id]["emoji"]}\n'
-                              f'<b>Ссылка:</b> {user_dict[message.from_user.id]["link"]}\n'
-                              f'<b>Ключевые слова:</b> {", ".join(user_dict[message.from_user.id]["keywords"])}\n'
-                              f'<b>Раздел:</b> {user_dict[message.from_user.id]["section"]}\n'
-                              f'<b>Позиция:</b> {user_dict[message.from_user.id]["position"]}\n'
-                              f'<b>Доступна:</b> {user_dict[message.from_user.id]["is_published"]}',
+    await message.answer(text=LEXICON_ADMIN['check_data'].format(**user_dict[message.from_user.id]),
                          disable_web_page_preview=True,
                          reply_markup=create_allow_publishing_keyboard())
 
