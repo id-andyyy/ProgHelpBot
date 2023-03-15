@@ -17,7 +17,7 @@ async def handle_section(text: str) -> int:
     return await sql_add_section(text)
 
 
-async def get_articles(only_section: str, secret_articles: bool) -> dict[str, list[dict[str, str | int]]]:
+async def get_articles(only_section: str = None, secret_articles: bool = False) -> dict[str, list[dict[str, str | int]]]:
     data: list[tuple[str | int]] = await sql_get_articles()
     sections: dict[int, str] = await get_sections()
 
@@ -27,6 +27,7 @@ async def get_articles(only_section: str, secret_articles: bool) -> dict[str, li
         title: str = row[1]
         emoji: str = row[2]
         link: str = row[3]
+        keywords: str = row[4]
         section: str = sections[row[5]]
         position: str = row[6]
         is_published: bool = row[7]
@@ -34,35 +35,34 @@ async def get_articles(only_section: str, secret_articles: bool) -> dict[str, li
         if (only_section is None or section == only_section) and (is_published or secret_articles):
             if section not in articles:
                 articles[section] = []
-            articles[section].append(dict(emoji=emoji,
-                                          title=title,
+            articles[section].append(dict(title=title,
+                                          emoji=emoji,
                                           link=link,
+                                          keywords=keywords,
                                           position=position,
                                           is_published=is_published))
 
-    return articles
+    return dict(sorted(articles.items(), key=lambda x: list(sections.values()).index(x[0])))  # TO DO: incorrect type
 
 
 async def print_articles(only_section: str = None, secret_articles: bool = False, new_article: bool = False) -> str:
-    articles: dict[str, list[dict[str, str | int]]] = await get_articles(only_section=only_section,
-                                                                         secret_articles=secret_articles)
-    sections: dict[int, str] = await get_sections()
+    data: dict[str, list[dict[str, str | int]]] = await get_articles(only_section=only_section,
+                                                                     secret_articles=secret_articles)
 
     text: str = ''
 
-    if len(articles) != 0:
-        for section in sections.values():
-            if section in articles:
-                if only_section is None:
-                    text += f'<b>{section}</b>\n'
-                for article in sorted(articles[section], key=lambda x: x["position"]):
-                    text += f'{str(article["position"]) + ". " if secret_articles else ""}{article["emoji"]} ' \
-                            f'<a href="{article["link"]}">{article["title"]}</a>' \
-                            f'{" " + (LEXICON_OTHER_ADMIN["is_published"] if article["is_published"] else LEXICON_OTHER_ADMIN["not_is_published"]) if secret_articles else ""}\n'
-                text += '\n'
+    if len(data) != 0:
+        for section, articles in data.items():
+            if only_section is None:
+                text += f'<b>{section}</b>\n'
+            for article in sorted(articles, key=lambda x: x["position"]):
+                text += f'{str(article["position"]) + ". " if secret_articles else ""}{article["emoji"]} ' \
+                        f'<a href="{article["link"]}">{article["title"]}</a>' \
+                        f'{" " + (LEXICON_OTHER_ADMIN["is_published"] if article["is_published"] else LEXICON_OTHER_ADMIN["not_is_published"]) if secret_articles else ""}\n'
+            text += '\n'
 
         if only_section is not None and new_article:
-            text = text[:-1] + f'{articles[only_section][-1]["position"] + 1}...'
+            text = text[:-1] + f'{data[only_section][-1]["position"] + 1}...'
     else:
         text += '1...'
 
