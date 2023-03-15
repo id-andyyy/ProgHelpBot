@@ -20,7 +20,7 @@ async def process_help_command(message: Message):
 
 @router.message(Command(commands=['articles']))
 async def process_articles_command(message: Message):
-    await message.answer(text=await print_articles(data=await get_articles()), disable_web_page_preview=True)
+    await message.answer(text=await print_articles(), disable_web_page_preview=True)
 
 
 @router.message(Command(commands=['creator']))

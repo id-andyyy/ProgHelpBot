@@ -7,8 +7,17 @@ async def get_sections() -> dict[int, str]:
     return {i[0]: i[1] for i in sorted(await sql_get_sections(), key=lambda x: x[2])}
 
 
-async def get_articles(only_section: str = None, secret_articles: bool = False) -> dict[
-    str, dict[str, list[dict[str, str | int]]] | str | bool]:
+async def handle_section(text: str) -> int:
+    sections: list[tuple[int | str]] = await sql_get_sections()
+
+    for section in sections:
+        if text in section:
+            return section[0]
+
+    return await sql_add_section(text)
+
+
+async def get_articles(only_section: str, secret_articles: bool) -> dict[str, list[dict[str, str | int]]]:
     data: list[tuple[str | int]] = await sql_get_articles()
     sections: dict[int, str] = await get_sections()
 
@@ -31,14 +40,12 @@ async def get_articles(only_section: str = None, secret_articles: bool = False) 
                                           position=position,
                                           is_published=is_published))
 
-    return dict(articles=articles, only_section=only_section, secret_articles=secret_articles)
+    return articles
 
 
-async def print_articles(data: dict[str, dict[str, list[dict[str, str | int]]] | str | bool],
-                         new_article: bool = False) -> str:
-    articles: dict[str, list[dict[str, str | int]]] = data['articles']
-    only_section: str = data['only_section']
-    secret_articles: bool = data['secret_articles']
+async def print_articles(only_section: str = None, secret_articles: bool = False, new_article: bool = False) -> str:
+    articles: dict[str, list[dict[str, str | int]]] = await get_articles(only_section=only_section,
+                                                                         secret_articles=secret_articles)
     sections: dict[int, str] = await get_sections()
 
     text: str = ''
@@ -60,16 +67,6 @@ async def print_articles(data: dict[str, dict[str, list[dict[str, str | int]]] |
         text += '1...'
 
     return text
-
-
-async def handle_section(text: str) -> int:
-    sections: list[tuple[int | str]] = await sql_get_sections()
-
-    for section in sections:
-        if text in section:
-            return section[0]
-
-    return await sql_add_section(text)
 
 
 async def handle_article_data(data: dict[str, str | list | int | bool]) -> dict[str, str | list | int | bool]:

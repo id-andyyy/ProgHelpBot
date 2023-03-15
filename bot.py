@@ -28,8 +28,8 @@ async def main():
     await set_user_menu(bot)
     await set_admin_menu(bot)
 
-    dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
+    dp.include_router(user_handlers.router)
     dp.include_router(other_handlers.router)
     
     sql_start(config.db.database)
