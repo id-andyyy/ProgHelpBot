@@ -72,16 +72,16 @@ async def process_section_sent(message: Message, state: FSMContext):
 @router.message(StateFilter(FSMAddArticle.fill_position), IsAdmin())
 async def process_position_sent(message: Message, state: FSMContext):
     await state.update_data(position=message.text)
-    await message.answer(text=LEXICON_ADMIN['fill_is_available'],
-                         reply_markup=await create_is_available_keyboard())
-    await state.set_state(FSMAddArticle.fill_is_available)
+    await message.answer(text=LEXICON_ADMIN['fill_is_published'],
+                         reply_markup=await create_is_published_keyboard())
+    await state.set_state(FSMAddArticle.fill_is_published)
 
 
-@router.message(StateFilter(FSMAddArticle.fill_is_available),
-                Text(text=[LEXICON_KEYBOARDS_ADMIN['available_button'],
-                           LEXICON_KEYBOARDS_ADMIN['not_available_button']]), IsAdmin())
-async def process_is_available_sent(message: Message, state: FSMContext):
-    await state.update_data(is_available=message.text[-1:])
+@router.message(StateFilter(FSMAddArticle.fill_is_published),
+                Text(text=[LEXICON_KEYBOARDS_ADMIN['is_published_button'],
+                           LEXICON_KEYBOARDS_ADMIN['not_is_published_button']]), IsAdmin())
+async def process_is_published_sent(message: Message, state: FSMContext):
+    await state.update_data(is_published=message.text[-1:])
     user_dict[message.from_user.id] = await state.get_data()
 
     await message.answer(text=LEXICON_ADMIN['check_data'].format(**user_dict[message.from_user.id]),
@@ -91,25 +91,19 @@ async def process_is_available_sent(message: Message, state: FSMContext):
     await state.set_state(FSMAddArticle.allow_publishing)
 
 
-@router.message(StateFilter(FSMAddArticle.fill_is_available), IsAdmin())
-async def warning_not_is_available(message: Message):
-    await message.answer(text=LEXICON_ADMIN['warning_keyboard'])
-
-
 @router.message(StateFilter(FSMAddArticle.allow_publishing),
                 Text(text=[LEXICON_KEYBOARDS_ADMIN['allow_publishing_button'],
                            LEXICON_KEYBOARDS_ADMIN['not_allow_publishing_button']]), IsAdmin())
 async def process_allow_publishing_sent(message: Message, state: FSMContext):
     if message.text == LEXICON_KEYBOARDS_ADMIN['allow_publishing_button']:
         await sql_add_article(await handle_article_data(user_dict[message.from_user.id]))
-        await message.answer(text=LEXICON_ADMIN['success'],
-                             reply_markup=ReplyKeyboardRemove())
+        await message.answer(text=LEXICON_ADMIN['success'], reply_markup=ReplyKeyboardRemove())
     else:
-        await message.answer(text=LEXICON_ADMIN['/cancel2'],
-                             reply_markup=ReplyKeyboardRemove())
+        await message.answer(text=LEXICON_ADMIN['/cancel2'], reply_markup=ReplyKeyboardRemove())
     await state.clear()
 
 
+@router.message(StateFilter(FSMAddArticle.fill_is_published), IsAdmin())
 @router.message(StateFilter(FSMAddArticle.allow_publishing), IsAdmin())
-async def warning_not_allow_publishing(message: Message):
+async def warning_not_is_available(message: Message):
     await message.answer(text=LEXICON_ADMIN['warning_keyboard'])

@@ -48,6 +48,6 @@ async def handle_section(text: str) -> int:
 async def handle_article_data(data: dict[str, str | list | int | bool]) -> dict[str, str | list | int | bool]:
     # data['keywords'].split(', ')
     data['section'] = await handle_section(data['section'])
-    data['is_available'] = data['is_available'] == LEXICON_KEYBOARDS_ADMIN['available_button'][-1:]
+    data['is_published'] = data['is_published'] == LEXICON_KEYBOARDS_ADMIN['is_published_button'][-1:]
 
     return data

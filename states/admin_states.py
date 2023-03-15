@@ -16,5 +16,5 @@ class FSMAddArticle(StatesGroup):
     fill_keywords = State()
     fill_section = State()
     fill_position = State()
-    fill_is_available = State()
+    fill_is_published = State()
     allow_publishing = State()

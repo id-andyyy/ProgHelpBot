@@ -39,7 +39,7 @@ async def sql_add_section(title: str) -> int:
     cur.execute('INSERT INTO sections VALUES (NULL, ?, ?)', (title, position))
     db.commit()
 
-    return position
+    return cur.lastrowid
 
 
 async def sql_get_sections() -> list[tuple[str | int]]:

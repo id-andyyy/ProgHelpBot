@@ -15,12 +15,13 @@ async def create_sections_keyboard() -> ReplyKeyboardMarkup:
     return sections_builder
 
 
-async def create_is_available_keyboard() -> ReplyKeyboardMarkup:
-    available_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['available_button'])
-    not_available_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['not_available_button'])
-    availability_builder: ReplyKeyboardMarkup = ReplyKeyboardMarkup(keyboard=[[available_button, not_available_button]],
-                                                                    resize_keyboard=True)
-    return availability_builder
+async def create_is_published_keyboard() -> ReplyKeyboardMarkup:
+    is_published_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['is_published_button'])
+    not_is_published_button: KeyboardButton = KeyboardButton(text=LEXICON_KEYBOARDS_ADMIN['not_is_published_button'])
+    is_published_builder: ReplyKeyboardMarkup = ReplyKeyboardMarkup(
+        keyboard=[[is_published_button, not_is_published_button]],
+        resize_keyboard=True)
+    return is_published_builder
 
 
 async def create_allow_publishing_keyboard() -> ReplyKeyboardMarkup:
