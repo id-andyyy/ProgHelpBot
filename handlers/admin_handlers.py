@@ -8,7 +8,7 @@ from lexicon.lexicon_admin import LEXICON_ADMIN, LEXICON_KEYBOARDS_ADMIN
 from filters.is_admin import IsAdmin
 from keyboards.admin_keyboard import *
 from database.sqlite import sql_add_article
-from services.services import handle_article_data
+from services.services import get_articles, handle_article_data
 
 router: Router = Router()
 
@@ -26,10 +26,14 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
     await state.clear()
 
 
+@router.message(Command(commands='allarticles'), IsAdmin())
+async def process_allarticles_command(message: Message):
+    await message.answer(text=await get_articles(secret_articles=True))
+
+
 @router.message(Command(commands=['addarticle']), StateFilter(default_state), IsAdmin())
 async def process_addarticle_command(message: Message, state: FSMContext):
-    await message.answer(text=LEXICON_ADMIN['fill_title'],
-                         reply_markup=ReplyKeyboardRemove())
+    await message.answer(text=LEXICON_ADMIN['fill_title'], reply_markup=ReplyKeyboardRemove())
     await state.set_state(FSMAddArticle.fill_title)
 
 
@@ -57,23 +61,23 @@ async def process_link_sent(message: Message, state: FSMContext):
 @router.message(StateFilter(FSMAddArticle.fill_keywords), IsAdmin())
 async def process_keywords_sent(message: Message, state: FSMContext):
     await state.update_data(keywords=message.text.lower())
-    await message.answer(text=LEXICON_ADMIN['fill_section'],
-                         reply_markup=await create_sections_keyboard())
+    await message.answer(text=LEXICON_ADMIN['fill_section'], reply_markup=await create_sections_keyboard())
     await state.set_state(FSMAddArticle.fill_section)
 
 
 @router.message(StateFilter(FSMAddArticle.fill_section), IsAdmin())
 async def process_section_sent(message: Message, state: FSMContext):
     await state.update_data(section=message.text)
-    await message.answer(text=LEXICON_ADMIN['fill_position'])  # add keyboard
+    await message.answer(text=LEXICON_ADMIN['fill_position'].format(
+        section=message.text,
+        articles=await get_articles(only_section=message.text, secret_articles=True, new_article=True)))
     await state.set_state(FSMAddArticle.fill_position)
 
 
 @router.message(StateFilter(FSMAddArticle.fill_position), IsAdmin())
 async def process_position_sent(message: Message, state: FSMContext):
     await state.update_data(position=message.text)
-    await message.answer(text=LEXICON_ADMIN['fill_is_published'],
-                         reply_markup=await create_is_published_keyboard())
+    await message.answer(text=LEXICON_ADMIN['fill_is_published'], reply_markup=await create_is_published_keyboard())
     await state.set_state(FSMAddArticle.fill_is_published)
 
 
