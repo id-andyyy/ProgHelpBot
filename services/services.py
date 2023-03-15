@@ -3,11 +3,16 @@ from keyboards.admin_keyboard import LEXICON_KEYBOARDS_ADMIN
 from lexicon.lexicon_admin import LEXICON_OTHER_ADMIN
 
 
-async def get_articles(only_section: str = None, secret_articles: bool = False, new_article: bool = False) -> str:
-    data: list[tuple[str | int]] = await sql_get_articles()
-    sections: dict[int, str] = {i[0]: i[1] for i in sorted(await sql_get_sections(), key=lambda x: x[2])}
+async def get_sections() -> dict[int, str]:
+    return {i[0]: i[1] for i in sorted(await sql_get_sections(), key=lambda x: x[2])}
 
-    articles: dict[str, list[dict[str, str | int | bool]]] = {}
+
+async def get_articles(only_section: str = None, secret_articles: bool = False) -> dict[
+    str, dict[str, list[dict[str, str | int]]] | str | bool]:
+    data: list[tuple[str | int]] = await sql_get_articles()
+    sections: dict[int, str] = await get_sections()
+
+    articles: dict[str, list[dict[str, str | int]]] = {}
 
     for row in data:
         title: str = row[1]
@@ -25,6 +30,16 @@ async def get_articles(only_section: str = None, secret_articles: bool = False, 
                                           link=link,
                                           position=position,
                                           is_published=is_published))
+
+    return dict(articles=articles, only_section=only_section, secret_articles=secret_articles)
+
+
+async def print_articles(data: dict[str, dict[str, list[dict[str, str | int]]] | str | bool],
+                         new_article: bool = False) -> str:
+    articles: dict[str, list[dict[str, str | int]]] = data['articles']
+    only_section: str = data['only_section']
+    secret_articles: bool = data['secret_articles']
+    sections: dict[int, str] = await get_sections()
 
     text: str = ''
 

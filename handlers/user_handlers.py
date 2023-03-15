@@ -3,8 +3,7 @@ from aiogram.filters import Command, CommandStart, Text
 from aiogram.types import Message
 
 from lexicon.lexicon_user import LEXICON_USER
-from database.sqlite import sql_get_articles
-from services.services import get_articles
+from services.services import get_articles, print_articles
 
 router: Router = Router()
 
@@ -21,7 +20,7 @@ async def process_help_command(message: Message):
 
 @router.message(Command(commands=['articles']))
 async def process_articles_command(message: Message):
-    await message.answer(text=await get_articles(), disable_web_page_preview=True)
+    await message.answer(text=await print_articles(data=await get_articles()), disable_web_page_preview=True)
 
 
 @router.message(Command(commands=['creator']))
