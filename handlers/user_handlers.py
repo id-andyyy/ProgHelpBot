@@ -3,7 +3,7 @@ from aiogram.filters import Command, CommandStart, Text
 from aiogram.types import Message
 
 from lexicon.lexicon_user import LEXICON_USER
-from services.services import get_articles, print_articles
+from services.services import print_articles, find_articles
 
 router: Router = Router()
 
@@ -26,3 +26,8 @@ async def process_articles_command(message: Message):
 @router.message(Command(commands=['creator']))
 async def process_creator_command(message: Message):
     await message.answer(text=LEXICON_USER['/creator'])
+
+
+@router.message()
+async def process_find(message: Message):
+    await message.answer(text=await print_articles(await find_articles(message.text)))

@@ -28,7 +28,7 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
 @router.message(Command(commands='allarticles'), IsAdmin())
 async def process_allarticles_command(message: Message):
-    await message.answer(text=await print_articles(secret_articles=True), disable_web_page_preview=True)
+    await message.answer(text=await print_articles(unpublished_articles=True), disable_web_page_preview=True)
 
 
 @router.message(Command(commands=['addarticle']), StateFilter(default_state), IsAdmin())
@@ -70,7 +70,7 @@ async def process_section_sent(message: Message, state: FSMContext):
     await state.update_data(section=message.text)
     await message.answer(text=LEXICON_ADMIN['fill_position'].format(
         section=message.text,
-        articles=await print_articles(only_section=message.text, secret_articles=True, new_article=True)),
+        articles=await print_articles(only_section=message.text, unpublished_articles=True, new_article=True)),
         disable_web_page_preview=True,
         reply_markup=ReplyKeyboardRemove())
     await state.set_state(FSMAddArticle.fill_position)
