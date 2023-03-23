@@ -23,6 +23,11 @@ async def process_articles_command(message: Message):
     await message.answer(text=await print_articles(), disable_web_page_preview=True)
 
 
+@router.message(Command(commands=['feedback']))
+async def process_feedback_command(message: Message):
+    await message.answer(text=LEXICON_USER['/feedback'])
+
+
 @router.message(Command(commands=['creator']))
 async def process_creator_command(message: Message):
     await message.answer(text=LEXICON_USER['/creator'])
