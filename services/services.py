@@ -1,4 +1,5 @@
 from fuzzywuzzy import fuzz
+from nltk import SnowballStemmer
 
 from database.sqlite import sql_get_articles, sql_add_section, sql_get_sections
 
@@ -7,6 +8,8 @@ from keyboards.admin_keyboard import LEXICON_KEYBOARDS_ADMIN
 from lexicon.lexicon_admin import LEXICON_OTHER_ADMIN
 from lexicon.lexicon_user import LEXICON_USER
 from lexicon.lexicon_other import LEXICON_OTHER
+
+stemmer: SnowballStemmer = SnowballStemmer("russian")
 
 
 async def get_sections() -> dict[int, str]:
@@ -72,8 +75,11 @@ async def print_articles(data: dict[str, list[dict[str, str | int]]] = None, onl
 
         if only_section is not None and new_article:
             text = text[:-1] + f'{data[only_section][-1]["position"] + 1}...'
-        elif search_mode:
+
+        if search_mode:
             text = LEXICON_USER['find_articles'].format(results=text)
+        else:
+            text = LEXICON_OTHER['articles'].format(articles=text)
     else:
         if only_section:
             text += '1...'
@@ -86,33 +92,33 @@ async def print_articles(data: dict[str, list[dict[str, str | int]]] = None, onl
 
 
 async def find_articles(text: str) -> dict[str, list[dict[str, str | int]]]:
-    words: list[str] = text.lower().split(' ')
+    words: list[str] = [stemmer.stem(word) for word in text.lower().split(' ')]
     data: dict[str, list[dict[str, str | int]]] = await get_articles()
 
     results: dict[str, list[dict[str, str | int]]] = {}
 
     for section, articles in data.items():
         for article in articles:
-            stop = False
-            for word in words:
-                for keyword in article['keywords'].split(', '):
-                    print(
-                        f'{keyword}\t{word}\t{fuzz.ratio(word, keyword)} {"*************" if fuzz.ratio(word, keyword) > 50 else ""}')
-                    if fuzz.ratio(word, keyword) > 50:
-                        if section not in results:
-                            results[section] = []
-                        results[section].append(article)
-                        stop = True
-                        break
+            if article['keywords'] is not None:
+                stop = False
+                for word in words:
+                    for keyword in article['keywords'].split(','):
+                        if fuzz.ratio(word, keyword) > 65:
+                            if section not in results:
+                                results[section] = []
+                            results[section].append(article)
+                            stop = True
 
-                if stop:
-                    break
+                            break
+
+                    if stop:
+                        break
 
     return results
 
 
 async def handle_article_data(data: dict[str, str | list | int | bool]) -> dict[str, str | list | int | bool]:
-    # data['keywords'].split(', ')
+    data['keywords'] = ','.join(sorted([stemmer.stem(word) for word in data['keywords'].split(',')]))
     data['section'] = await add_section(data['section'])
     data['is_published'] = data['is_published'] == LEXICON_KEYBOARDS_ADMIN['is_published_button'][-1:]
 

@@ -30,4 +30,5 @@ async def process_creator_command(message: Message):
 
 @router.message()
 async def process_find(message: Message):
-    await message.answer(text=await print_articles(await find_articles(message.text)))
+    await message.answer(text=await print_articles(data=await find_articles(message.text), search_mode=True),
+                         disable_web_page_preview=True)
