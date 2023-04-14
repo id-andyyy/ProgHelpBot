@@ -3,8 +3,8 @@ from aiogram.types import BotCommand, BotCommandScopeChat
 
 from filters.is_admin import IsAdmin
 
-from lexicon.lexicon_user import LEXICON_COMMANDS_USER
-from lexicon.lexicon_admin import LEXICON_COMMANDS_ADMIN
+from lexicon.user_lexicon import LEXICON_COMMANDS_USER
+from lexicon.admin_lexicon import LEXICON_COMMANDS_ADMIN
 
 from config_data.config import load_config
 

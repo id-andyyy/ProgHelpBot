@@ -4,7 +4,7 @@ from aiogram.filters import Command, CommandStart, Text
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from states.admin_states import *
-from lexicon.lexicon_admin import LEXICON_ADMIN, LEXICON_KEYBOARDS_ADMIN
+from lexicon.admin_lexicon import LEXICON_ADMIN, LEXICON_KEYBOARDS_ADMIN
 from filters.is_admin import IsAdmin
 from keyboards.admin_keyboard import *
 from database.sqlite import sql_add_article

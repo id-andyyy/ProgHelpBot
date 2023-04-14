@@ -5,9 +5,9 @@ from database.sqlite import sql_get_articles, sql_add_section, sql_get_sections
 
 from keyboards.admin_keyboard import LEXICON_KEYBOARDS_ADMIN
 
-from lexicon.lexicon_admin import LEXICON_OTHER_ADMIN
-from lexicon.lexicon_user import LEXICON_USER
-from lexicon.lexicon_other import LEXICON_OTHER
+from lexicon.admin_lexicon import LEXICON_OTHER_ADMIN
+from lexicon.user_lexicon import LEXICON_USER
+from lexicon.other_lexicon import LEXICON_OTHER
 
 stemmer: SnowballStemmer = SnowballStemmer("russian")
 
@@ -103,12 +103,12 @@ async def find_articles(text: str) -> dict[str, list[dict[str, str | int]]]:
                 stop = False
                 for word in words:
                     for keyword in article['keywords'].split(','):
-                        if fuzz.ratio(word, keyword) > 65:
+                        if fuzz.ratio(word, keyword) > 83:
                             if section not in results:
                                 results[section] = []
                             results[section].append(article)
                             stop = True
-
+                            print(keyword, fuzz.ratio(word, keyword), sep=" ")
                             break
 
                     if stop:

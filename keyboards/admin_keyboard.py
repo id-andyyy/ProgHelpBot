@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from lexicon.lexicon_admin import LEXICON_KEYBOARDS_ADMIN
+from lexicon.admin_lexicon import LEXICON_KEYBOARDS_ADMIN
 from database.sqlite import sql_get_sections
 
 
