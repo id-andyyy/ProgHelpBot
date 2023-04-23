@@ -1,5 +1,5 @@
 from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeChat
+from aiogram.types import BotCommand, BotCommandScopeChat, BotCommandScopeDefault
 
 from filters.is_admin import IsAdmin
 
@@ -19,7 +19,7 @@ async def set_user_menu(bot: Bot):
         description=description
     ) for command, description in LEXICON_COMMANDS_USER.items()]
 
-    await bot.set_my_commands(commands=main_menu_commands)
+    await bot.set_my_commands(commands=main_menu_commands, scope=BotCommandScopeDefault())
 
 
 async def set_admin_menu(bot: Bot):

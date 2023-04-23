@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher
 from config_data.config import load_config
 from states import admin_states
 from keyboards.set_menu import set_user_menu, set_admin_menu
-from handlers import user_handlers, admin_handlers, other_handlers
+from handlers import user_handlers, admin_handlers
 from database.sqlite import sql_start
 
 logger = logging.getLogger(__name__)
@@ -25,12 +25,12 @@ async def main():
     bot: Bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp: Dispatcher = Dispatcher(storage=admin_states.storage)
 
-    await set_user_menu(bot)
-    await set_admin_menu(bot)
+    await bot.delete_my_commands()
+    # await set_user_menu(bot)
+    # await set_admin_menu(bot)
 
     dp.include_router(admin_handlers.router)
     dp.include_router(user_handlers.router)
-    dp.include_router(other_handlers.router)
     
     sql_start(config.db.database)
 

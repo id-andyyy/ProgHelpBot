@@ -28,9 +28,19 @@ async def process_search_command(message: Message):
     await message.answer(text=LEXICON_USER['/search'])
 
 
+@router.message(Command(commands=['report']))
+async def process_feedback_command(message: Message):
+    await message.answer(text=LEXICON_USER['/report'])
+
+
 @router.message(Command(commands=['feedback']))
 async def process_feedback_command(message: Message):
     await message.answer(text=LEXICON_USER['/feedback'])
+
+
+@router.message(Command(commands=['sources']))
+async def process_feedback_command(message: Message):
+    await message.answer(text=LEXICON_USER['/sources'])
 
 
 @router.message(Command(commands=['creator']))
