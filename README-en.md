@@ -53,7 +53,7 @@ A Telegram bot that acts as a knowledge base. Users can view articles by section
     - `fuzzywuzzy` and `python-Levenshtein` for fuzzy keyword search.
 - **Configuration Management**: `environs` for loading settings from an `.env` file.
 
-## Technical Decisions:
+## Technical Decisions
 
 - **Modular Architecture**: The project is divided into logical components (`handlers`, `services`, `database`, `keyboards`, `lexicon`, `states`, `config_data`), which simplifies its maintenance and development.
 - **Use of Routers**: `aiogram.Router` is used to separate handlers into user and admin handlers.
