@@ -1,6 +1,6 @@
-from aiogram import Router
-from aiogram.filters import Command, CommandStart, Text
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.filters import Command, CommandStart
+from aiogram.types import Message, ReplyKeyboardRemove
 
 from lexicon.user_lexicon import LEXICON_USER
 from services.services import print_articles, find_articles

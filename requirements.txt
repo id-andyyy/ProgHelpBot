@@ -1,0 +1,7 @@
+aiogram==3.8.0
+environs==10.3.0
+marshmallow<4.0.0
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.25.1
+nltk==3.8.1
+wheel==0.43.0 

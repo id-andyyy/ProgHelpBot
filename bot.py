@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 
 from config_data.config import load_config
 from states import admin_states
@@ -22,7 +23,8 @@ async def main():
 
     config = load_config(r'.env')
 
-    bot: Bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
+    bot: Bot = Bot(token=config.tg_bot.token,
+                   default=DefaultBotProperties(parse_mode='HTML'))
     dp: Dispatcher = Dispatcher(storage=admin_states.storage)
 
     await bot.delete_my_commands()
@@ -31,7 +33,7 @@ async def main():
 
     dp.include_router(admin_handlers.router)
     dp.include_router(user_handlers.router)
-    
+
     sql_start(config.db.database)
 
     await bot.delete_webhook(drop_pending_updates=True)

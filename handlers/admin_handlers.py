@@ -1,6 +1,7 @@
-from aiogram import F
-from aiogram import Router
-from aiogram.filters import Command, CommandStart, Text
+from aiogram import F, Router
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import default_state
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from states.admin_states import *
@@ -84,7 +85,7 @@ async def process_position_sent(message: Message, state: FSMContext):
 
 
 @router.message(StateFilter(FSMAddArticle.fill_is_published),
-                Text(text=[LEXICON_KEYBOARDS_ADMIN['is_published_button'],
+                F.text.in_([LEXICON_KEYBOARDS_ADMIN['is_published_button'],
                            LEXICON_KEYBOARDS_ADMIN['not_is_published_button']]), IsAdmin())
 async def process_is_published_sent(message: Message, state: FSMContext):
     await state.update_data(is_published=message.text[-1:])
@@ -98,7 +99,7 @@ async def process_is_published_sent(message: Message, state: FSMContext):
 
 
 @router.message(StateFilter(FSMAddArticle.allow_publishing),
-                Text(text=[LEXICON_KEYBOARDS_ADMIN['allow_publishing_button'],
+                F.text.in_([LEXICON_KEYBOARDS_ADMIN['allow_publishing_button'],
                            LEXICON_KEYBOARDS_ADMIN['not_allow_publishing_button']]), IsAdmin())
 async def process_allow_publishing_sent(message: Message, state: FSMContext):
     if message.text == LEXICON_KEYBOARDS_ADMIN['allow_publishing_button']:
